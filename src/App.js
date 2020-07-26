@@ -3,17 +3,40 @@ import React, { Component } from "react";
 import data from "./data.json";
 import Products from "./components/Products";
 import Filter from "./components/Filter";
+import Cart from "./components/Cart";
 class App extends Component {
   constructor() {
     super();
     this.state = {
       products: data.products,
+      cartItems: [],
       size: "",
       sort: "",
     };
   }
+  //remove from cart
+  removeFromCart = (product) => {
+    const cartItems = this.state.cartItems.slice();
+    this.setState({
+      cartItems: cartItems.filter((x) => x._id !== product._id),
+    });
+  };
+  //cartItems method
+  addToCart = (product) => {
+    const cartItems = this.state.cartItems.slice();
+    let alreadyInCart = false;
+    cartItems.forEach((item) => {
+      if (item._id === product._id) {
+        item.count++;
+        alreadyInCart = true;
+      }
+    });
+    if (!alreadyInCart) {
+      cartItems.push({ ...product, count: 1 });
+    }
+    this.setState({ cartItems });
+  };
   sortProducts = (event) => {
-    console.log(event.target.value);
     //add logic
     const sort = event.target.value;
     this.setState((state) => ({
@@ -36,7 +59,6 @@ class App extends Component {
     }));
   };
   filterProducts = (event) => {
-    console.log(event.target.value);
     //add logic
     if (event.target.value === "") {
       this.setState({ size: event.target.value, products: data.products });
@@ -65,9 +87,17 @@ class App extends Component {
                 filterProducts={this.filterProducts}
                 sortProducts={this.sortProducts}
               ></Filter>
-              <Products products={this.state.products}></Products>
+              <Products
+                products={this.state.products}
+                addToCart={this.addToCart}
+              ></Products>
             </div>
-            <div className="sidebar">Cart Items</div>
+            <div className="sidebar">
+              <Cart
+                cartItems={this.state.cartItems}
+                removeFromCart={this.removeFromCart}
+              />
+            </div>
           </div>
         </main>
         <footer>All rights reserved.</footer>
