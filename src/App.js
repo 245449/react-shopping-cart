@@ -9,7 +9,9 @@ class App extends Component {
     super();
     this.state = {
       products: data.products,
-      cartItems: [],
+      cartItems: localStorage.getItem("cartItems")
+        ? JSON.parse(localStorage.getItem("cartItems"))
+        : [],
       size: "",
       sort: "",
     };
@@ -20,6 +22,10 @@ class App extends Component {
     this.setState({
       cartItems: cartItems.filter((x) => x._id !== product._id),
     });
+    localStorage.setItem(
+      "cartItems",
+      JSON.stringify(cartItems.filter((x) => x._id !== product._id))
+    );
   };
   //cartItems method
   addToCart = (product) => {
@@ -35,6 +41,7 @@ class App extends Component {
       cartItems.push({ ...product, count: 1 });
     }
     this.setState({ cartItems });
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   };
   sortProducts = (event) => {
     //add logic
@@ -71,6 +78,10 @@ class App extends Component {
       });
     }
   };
+  //create order
+  createOrder = (order) => {
+    alert("This is order of " + order.name);
+  };
   render() {
     return (
       <div className="grid-container">
@@ -96,6 +107,7 @@ class App extends Component {
               <Cart
                 cartItems={this.state.cartItems}
                 removeFromCart={this.removeFromCart}
+                createOrder={this.createOrder}
               />
             </div>
           </div>
